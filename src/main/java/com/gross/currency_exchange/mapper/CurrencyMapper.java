@@ -13,11 +13,8 @@ public interface CurrencyMapper {
     CurrencyMapper INSTANCE = Mappers.getMapper(CurrencyMapper.class);
 
     CurrencyDTO toDTO(Currency currency);
-
     Currency toEntity(CurrencyDTO dto);
-
     List<CurrencyDTO> toDTOList(List<Currency> currencies);
-
     List<Currency> toEntityList(List<CurrencyDTO> currencyDTOS);
 
 }

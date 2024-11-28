@@ -7,5 +7,5 @@ import java.util.List;
 public interface CurrencyDAO {
     public List<Currency> getAllCurrencies();
     public Currency getCurrencyByCode(String code);
-    public Currency saveCurrency(Currency currency);
+    public Currency addCurrency(Currency currency);
 }

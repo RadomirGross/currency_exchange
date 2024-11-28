@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 @WebServlet("/currency/*")
 public class SingleCurrencyServlet extends HttpServlet {
@@ -25,28 +26,25 @@ public class SingleCurrencyServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+        String code = null;
         try {
             String pathInfo = request.getPathInfo();
-            if (pathInfo != null && pathInfo.startsWith("/")) {
-                String code = pathInfo.substring(1).toUpperCase();
-                CurrencyDTO currencyDTO = currencyService.getCurrencyByCode(code);
-                if (currencyDTO != null) {
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    response.setStatus(200);
-                    objectMapper.writeValue(response.getWriter(), currencyDTO);
-                } else {
-                    response.setStatus(404);
-                    response.getWriter().println("Currency with code " + code + " not found");
-                }
-            } else {
+            if (pathInfo == null || !pathInfo.matches("/[A-Z]{3}")) {
                 response.setStatus(400);
-                response.getWriter().println("Invalid currency code");
+                response.getWriter().write("{\"error\": \"Invalid currency code. Expected format: /currency/USD\"}");
+                return;
             }
+            code = pathInfo.substring(1).toUpperCase();
+            CurrencyDTO currencyDTO = currencyService.getCurrencyByCode(code);
+            ObjectMapper objectMapper = new ObjectMapper();
+            response.setStatus(200);
+            objectMapper.writeValue(response.getWriter(), currencyDTO);
+        } catch (NoSuchElementException e) {
+            response.setStatus(404);
+            response.getWriter().write("{\"error\": \""+e.getMessage() + "\"}");
         } catch (Exception e) {
-            response.setStatus(500);;
-            response.getWriter().println(e.getMessage());
+            response.setStatus(500);
+            response.getWriter().write("{\"error\": \"Internal server error: " + e.getMessage() + "\"}");
         }
     }
 }
