@@ -9,6 +9,7 @@ import com.gross.currency_exchange.service.CurrencyService;
 import com.gross.currency_exchange.service.CurrencyServiceImpl;
 import com.gross.currency_exchange.service.ExchangeRateService;
 import com.gross.currency_exchange.service.ExchangeRateServiceImpl;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -40,6 +41,8 @@ public class ExchangeRateServlet extends HttpServlet {
             String json = mapper.writeValueAsString(exchangeRateDTOList);
             response.setStatus(200);
             response.getWriter().write(json);
+        } catch (EntityNotFoundException e) {
+            e.getMessage();
         } catch (Exception e) {
             response.setStatus(500);
             response.getWriter().write("{\"error\": " + e.getMessage() + "\"}");
@@ -56,25 +59,24 @@ public class ExchangeRateServlet extends HttpServlet {
             response.getWriter().write("{\"error\": \"Missing required parameters: baseCurrencyCode, targetCurrencyCode, rate.\"}");
             return;
         }
-        if (rateStr.trim().isEmpty())
-        {  response.setStatus(400);
+        if (rateStr.trim().isEmpty()) {
+            response.setStatus(400);
             response.getWriter().write("{\"error\": \"Rate is missing or empty.\"}");
-        return;}
+            return;
+        }
 
-            BigDecimal rate = new BigDecimal(rateStr);
+        BigDecimal rate = new BigDecimal(rateStr);
         try {
             ExchangeRateDTO savedExchangeRate = exchangeRateService.addExchangeRate(baseCurrencyCode, targetCurrencyCode, rate);
             response.setStatus(201);
             response.getWriter().write(mapper.writeValueAsString(savedExchangeRate));
-        }catch (IllegalArgumentException | ConstraintViolationException e) {
+        } catch (IllegalArgumentException | ConstraintViolationException e) {
             response.setStatus(409);
             response.getWriter().write("{\"error\":" + e.getMessage() + "\"}");
-        }
-        catch (NoSuchElementException e)
-        {  response.setStatus(404);
+        } catch (NoSuchElementException e) {
+            response.setStatus(404);
             response.getWriter().write("{\"error\":" + e.getMessage() + "\"}");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             response.setStatus(500);
             response.getWriter().write("{\"error\": \"Internal server error: " + e.getMessage() + "\"}");
         }

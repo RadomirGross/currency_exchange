@@ -10,5 +10,5 @@ public interface ExchangeRateDAO {
     List<ExchangeRate> getAllExchangeRates();
     ExchangeRate getExchangeRate(Currency baseCurrency, Currency targetCurrency);
     ExchangeRate addExchangeRate(ExchangeRate exchangeRate);
-    ExchangeRate updateExchangeRate(ExchangeRate exchangeRate);
+    void updateExchangeRate(ExchangeRate exchangeRate);
 }

@@ -29,7 +29,7 @@ public class CurrencyServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+        System.out.println("doGet works");
         try {
             List<CurrencyDTO> currencies = currencyService.getAllCurrencies();
             String jsonResponse = objectMapper.writeValueAsString(currencies);
@@ -58,5 +58,11 @@ public class CurrencyServlet extends HttpServlet {
             response.setStatus(500);
             response.getWriter().write("{\"error\": \"Internal server error: " + e.getMessage() + "\"}");
         }
+    }
+
+    @Override
+    protected void doPatch(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        System.out.println("PATCH request received");
+        resp.getWriter().write("{\"Patch method works \"}");
     }
 }

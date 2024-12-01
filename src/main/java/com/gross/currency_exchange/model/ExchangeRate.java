@@ -3,9 +3,11 @@ package com.gross.currency_exchange.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 
+@ToString
 @Data
 @NoArgsConstructor
 @Entity
