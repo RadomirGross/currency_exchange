@@ -18,6 +18,7 @@ public class ExchangeResultServiceImpl implements ExchangeResultService {
     private final ExchangeRateService exchangeRateService;
     private final CurrencyMapper currencyMapper = CurrencyMapper.INSTANCE;
     private final ExchangeRateMapper exchangeRateMapper = ExchangeRateMapper.INSTANCE;
+    private final String BASE_CURRENCY_CODE = "USD";
 
     public ExchangeResultServiceImpl() {
         this.currencyService = new CurrencyServiceImpl(new CurrencyDAOImpl());
@@ -26,6 +27,25 @@ public class ExchangeResultServiceImpl implements ExchangeResultService {
 
     @Override
     public ExchangeResult getExchangeResult(String baseCurrencyCode, String targetCurrencyCode, BigDecimal amount) {
+        validateInput(baseCurrencyCode, targetCurrencyCode, amount);
+        try {
+            BigDecimal rate;
+            if ((rate = getDirectRate(baseCurrencyCode, targetCurrencyCode)) != null)
+                return buildExchangeResult(baseCurrencyCode, targetCurrencyCode, amount, rate);
+
+            if((rate=getReverseRate(baseCurrencyCode, targetCurrencyCode)) != null)
+                return buildExchangeResult(baseCurrencyCode, targetCurrencyCode, amount, rate);
+
+            if((rate=getRateUsingUSDCurrency(baseCurrencyCode, targetCurrencyCode)) != null)
+                return buildExchangeResult(baseCurrencyCode, targetCurrencyCode, amount, rate);
+        }catch (EntityNotFoundException e)
+        {
+            return null;
+        }
+        return null;
+    }
+
+    private void validateInput(String baseCurrencyCode, String targetCurrencyCode, BigDecimal amount) {
         if (baseCurrencyCode == null || baseCurrencyCode.isEmpty() ||
                 targetCurrencyCode == null || targetCurrencyCode.isEmpty() || amount == null) {
             throw new IllegalArgumentException("Currency codes and amount must not be null.");
@@ -33,48 +53,53 @@ public class ExchangeResultServiceImpl implements ExchangeResultService {
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Amount must be greater than zero.");
         }
+    }
 
-        ExchangeResult exchangeResult = new ExchangeResult();
-        exchangeResult.setBaseCurrency(currencyMapper.toEntity(currencyService.getCurrencyByCode(baseCurrencyCode)));
-        exchangeResult.setTargetCurrency(currencyMapper.toEntity(currencyService.getCurrencyByCode(targetCurrencyCode)));
-        exchangeResult.setAmount(amount);
-        System.out.println(exchangeResult.getBaseCurrency());
-        System.out.println(exchangeResult.getTargetCurrency());
+    private ExchangeResult buildExchangeResult(String baseCurrencyCode, String targetCurrencyCode, BigDecimal amount, BigDecimal rate) {
+        ExchangeResult result = new ExchangeResult();
+        result.setBaseCurrency(currencyMapper.toEntity(currencyService.getCurrencyByCode(baseCurrencyCode)));
+        result.setTargetCurrency(currencyMapper.toEntity(currencyService.getCurrencyByCode(targetCurrencyCode)));
+        result.setAmount(amount);
+        result.setRate(rate);
+        result.setConvertedAmount(amount.multiply(rate).setScale(2, RoundingMode.HALF_UP));
+        return result;
+    }
+
+    private BigDecimal getDirectRate(String baseCurrencyCode, String targetCurrencyCode) {
         try {
             ExchangeRate exchangeRate = exchangeRateMapper.
                     toExchangeRate(exchangeRateService.getExchangeRate(baseCurrencyCode, targetCurrencyCode));
-            exchangeResult.setRate(exchangeRate.getRate());
-            exchangeResult.setConvertedAmount(amount.multiply(exchangeResult.getRate()));
-            return exchangeResult;
+            return exchangeRate.getRate();
         } catch (EntityNotFoundException e) {
-            try {
-                ExchangeRate exchangeRate = exchangeRateMapper
-                        .toExchangeRate(exchangeRateService.getExchangeRate(targetCurrencyCode, baseCurrencyCode));
-                if (exchangeRate != null) {
-                    exchangeResult.setRate(BigDecimal.ONE.divide(exchangeRate.getRate(), MathContext.DECIMAL64));
-                    exchangeResult.setConvertedAmount(amount.multiply(exchangeResult.getRate()));
-                    return exchangeResult;
-                }
-            } catch (EntityNotFoundException x) {
-                try {
-                    ExchangeRate baseExchangeRateFromUSD = exchangeRateMapper
-                            .toExchangeRate(exchangeRateService.getExchangeRate("USD", baseCurrencyCode));
+            return null;
+        }
+    }
 
-                    ExchangeRate targetExchangeRateFromUSD = exchangeRateMapper
-                            .toExchangeRate(exchangeRateService.getExchangeRate("USD", targetCurrencyCode));
+    private BigDecimal getReverseRate(String baseCurrencyCode, String targetCurrencyCode) {
+        try {
+            ExchangeRate exchangeRate = exchangeRateMapper
+                    .toExchangeRate(exchangeRateService.getExchangeRate(targetCurrencyCode, baseCurrencyCode));
+            return BigDecimal.ONE.divide(exchangeRate.getRate(), MathContext.DECIMAL64);
+        } catch (EntityNotFoundException e) {
+            return null;
+        }
+    }
 
-                    if (baseExchangeRateFromUSD != null && targetExchangeRateFromUSD != null) {
-                        exchangeResult.setRate(targetExchangeRateFromUSD.getRate()
-                                .divide(baseExchangeRateFromUSD.getRate(), 6, RoundingMode.HALF_UP));
+    private BigDecimal getRateUsingUSDCurrency(String baseCurrencyCode, String targetCurrencyCode) {
+        try {
+            ExchangeRate baseExchangeRateFromUSD = exchangeRateMapper
+                    .toExchangeRate(exchangeRateService.getExchangeRate(BASE_CURRENCY_CODE, baseCurrencyCode));
 
-                        exchangeResult.setConvertedAmount(amount.multiply(exchangeResult.getRate().setScale(2, RoundingMode.HALF_UP)));
-                        return exchangeResult;
-                    }
-                } catch (EntityNotFoundException z) {
-                    return null;
-                }
-            }
+            ExchangeRate targetExchangeRateFromUSD = exchangeRateMapper
+                    .toExchangeRate(exchangeRateService.getExchangeRate(BASE_CURRENCY_CODE, targetCurrencyCode));
+
+            if (baseExchangeRateFromUSD != null && targetExchangeRateFromUSD != null)
+                return targetExchangeRateFromUSD.getRate()
+                        .divide(baseExchangeRateFromUSD.getRate(), 6, RoundingMode.HALF_UP);
+        } catch (EntityNotFoundException e) {
+            return null;
         }
         return null;
     }
+
 }
