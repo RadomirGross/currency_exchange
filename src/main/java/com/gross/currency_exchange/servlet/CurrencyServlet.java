@@ -29,7 +29,10 @@ public class CurrencyServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        System.out.println("doGet works");
+        response.setHeader("Access-Control-Allow-Origin", "*"); // Разрешить запросы с любого домена
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
         try {
             List<CurrencyDTO> currencies = currencyService.getAllCurrencies();
             String jsonResponse = objectMapper.writeValueAsString(currencies);

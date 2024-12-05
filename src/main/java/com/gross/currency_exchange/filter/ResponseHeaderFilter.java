@@ -13,9 +13,15 @@ public class ResponseHeaderFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         if (servletResponse instanceof HttpServletResponse)
         {
-            HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
-            httpServletResponse.setContentType("application/json");
-            httpServletResponse.setCharacterEncoding("UTF-8");
+            HttpServletResponse response = (HttpServletResponse) servletResponse;
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+
+            response.setHeader("Access-Control-Allow-Origin", "*");
+            response.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH");
+            response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
         }
         filterChain.doFilter(servletRequest, servletResponse);
     }
