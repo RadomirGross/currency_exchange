@@ -24,14 +24,14 @@ public class Currency {
     private String code;
 
     @Column(name = "fullname", nullable = false)
-    private String fullName;
+    private String name;
 
     @Column(name = "sign", length = 10)
     private String sign;
 
-    public Currency(String code, String fullName, String sign) {
+    public Currency(String code, String name, String sign) {
         this.code = code;
-        this.fullName = fullName;
+        this.name = name;
         this.sign = sign;
     }
 

@@ -1,4 +1,10 @@
+CREATE DATABASE IF NOT EXISTS currency_db;
+
+-- Подключение к базе данных
+\c currency_db;
+
 CREATE TABLE currencies (
+
                             id SERIAL PRIMARY KEY,
                             code VARCHAR(10) NOT NULL UNIQUE,
                             fullname VARCHAR(255) NOT NULL,

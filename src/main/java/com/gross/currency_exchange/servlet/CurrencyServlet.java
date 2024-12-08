@@ -29,9 +29,7 @@ public class CurrencyServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setHeader("Access-Control-Allow-Origin", "*"); // Разрешить запросы с любого домена
-        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
 
         try {
             List<CurrencyDTO> currencies = currencyService.getAllCurrencies();
@@ -47,11 +45,11 @@ public class CurrencyServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String code = request.getParameter("code");
-        String fullName = request.getParameter("fullName");
+        String name = request.getParameter("name");
         String sign = request.getParameter("sign");
 
         try {
-            CurrencyDTO savedCurrency = currencyService.addCurrency(code,fullName,sign);
+            CurrencyDTO savedCurrency = currencyService.addCurrency(code,name,sign);
             response.setStatus(201);
             response.getWriter().write(objectMapper.writeValueAsString(savedCurrency));
         } catch (ConstraintViolationException e) {

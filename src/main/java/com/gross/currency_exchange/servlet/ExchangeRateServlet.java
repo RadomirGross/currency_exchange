@@ -22,7 +22,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-@WebServlet("/exchangerates")
+@WebServlet("/exchangeRates")
 public class ExchangeRateServlet extends HttpServlet {
     private final ExchangeRateService exchangeRateService;
     private final ObjectMapper mapper;

@@ -4,7 +4,6 @@ import com.gross.currency_exchange.dao.CurrencyDAO;
 import com.gross.currency_exchange.dto.CurrencyDTO;
 import com.gross.currency_exchange.mapper.CurrencyMapper;
 import com.gross.currency_exchange.model.Currency;
-import jakarta.persistence.PersistenceException;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -36,16 +35,16 @@ public class CurrencyServiceImpl implements CurrencyService {
     }
 
     @Override
-    public CurrencyDTO addCurrency(String code, String fullName, String sign) {
+    public CurrencyDTO addCurrency(String code, String name, String sign) {
         if (code == null || code.isEmpty())
             throw new IllegalArgumentException("Invalid input: 'code' must not be null or empty.");;
-        if (fullName == null || fullName.isEmpty())
-            throw new IllegalArgumentException("Invalid input: 'fullName' must not be null or empty.");;
+        if (name == null || name.isEmpty())
+            throw new IllegalArgumentException("Invalid input: 'name' must not be null or empty.");;
         if (sign == null || sign.isEmpty())
             throw new IllegalArgumentException("Invalid input: 'sign' must not be null or empty.");;
         CurrencyDTO currencyDTO = new CurrencyDTO();
         currencyDTO.setCode(code);
-        currencyDTO.setFullName(fullName);
+        currencyDTO.setName(name);
         currencyDTO.setSign(sign);
 
         Currency currencyEntity = currencyMapper.toEntity(currencyDTO);

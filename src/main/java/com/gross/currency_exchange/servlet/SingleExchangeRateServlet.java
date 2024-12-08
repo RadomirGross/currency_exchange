@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.NoSuchElementException;
 
-@WebServlet("/exchangerate/*")
+@WebServlet("/exchangeRate/*")
 public class SingleExchangeRateServlet extends HttpServlet {
 
     private final ExchangeRateService exchangeRateService;
