@@ -36,12 +36,19 @@ public class CurrencyServiceImpl implements CurrencyService {
 
     @Override
     public CurrencyDTO addCurrency(String code, String name, String sign) {
-        if (code == null || code.isEmpty())
-            throw new IllegalArgumentException("Invalid input: 'code' must not be null or empty.");;
+        if (code == null || code.isEmpty() )
+            throw new IllegalArgumentException("Invalid input: 'code' must not be null or empty.");
+        if (code.length()>3)
+            throw new IllegalArgumentException("Invalid input: 'code' must not be longer than 3 characters.");
         if (name == null || name.isEmpty())
-            throw new IllegalArgumentException("Invalid input: 'name' must not be null or empty.");;
+            throw new IllegalArgumentException("Invalid input: 'name' must not be null or empty.");
+        if (name.length() > 30)
+            throw new IllegalArgumentException("Invalid input: 'name' must not be longer than 30 characters.");
         if (sign == null || sign.isEmpty())
-            throw new IllegalArgumentException("Invalid input: 'sign' must not be null or empty.");;
+            throw new IllegalArgumentException("Invalid input: 'sign' must not be null or empty.");
+        if (sign.length() > 3)
+            throw new IllegalArgumentException("Invalid input: 'sign' must not be longer than 3 characters.");
+
         CurrencyDTO currencyDTO = new CurrencyDTO();
         currencyDTO.setCode(code);
         currencyDTO.setName(name);

@@ -12,23 +12,24 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Entity
 @Table(
-        name = "exchange_rates",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"baseCurrencyId", "targetCurrencyId"})
+        name = "\"ExchangeRates\"",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"\"BaseCurrencyId\"", "\"TargetCurrencyId\""})
 )
 public class ExchangeRate {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "\"ID\"")
     private int id;
 
     @ManyToOne
-    @JoinColumn(name = "base_currency_Id", nullable = false)
+    @JoinColumn(name = "\"BaseCurrencyId\"", nullable = false)
     private Currency baseCurrency;
 
     @ManyToOne
-    @JoinColumn(name = "target_currency_Id", nullable = false)
+    @JoinColumn(name = "\"TargetCurrencyId\"", nullable = false)
     private Currency targetCurrency;
 
-    @Column(name = "rate", nullable = false, precision = 10, scale = 6)
+    @Column(name = "\"Rate\"", nullable = false, precision = 10, scale = 6)
     private BigDecimal rate;
 }

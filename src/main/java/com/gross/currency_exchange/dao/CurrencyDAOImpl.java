@@ -30,7 +30,7 @@ public class CurrencyDAOImpl implements CurrencyDAO {
     @Override
     public Currency getCurrencyByCode(String code) {
         try (Session session = sessionFactory.openSession()) {
-            String sql = "SELECT * FROM currencies WHERE code = :code";
+            String sql = "SELECT * FROM \"Currencies\" WHERE \"Code\" = :code";
             NativeQuery<Currency> query = session.createNativeQuery(sql, Currency.class);
             query.setParameter("code", code);
             return query.uniqueResult();

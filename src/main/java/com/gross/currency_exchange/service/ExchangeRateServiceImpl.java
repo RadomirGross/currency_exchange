@@ -54,13 +54,13 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
     public ExchangeRateDTO addExchangeRate(String baseCurrencyCode, String targetCurrencyCode, BigDecimal rate) {
         if (baseCurrencyCode == null || baseCurrencyCode.isEmpty())
             throw new IllegalArgumentException("Invalid input: 'baseCurrencyCode' must not be null or empty.");
-        ;
+
         if (targetCurrencyCode == null || targetCurrencyCode.isEmpty())
             throw new IllegalArgumentException("Invalid input: 'targetCurrencyCode' must not be null or empty.");
-        ;
+
         if (rate == null || rate.compareTo(BigDecimal.ZERO) < 0)
             throw new IllegalArgumentException("Invalid input: 'rate' must not be null or negative.");
-        ;
+
 
 
         ExchangeRateDTO savedExchangeRateDTO = new ExchangeRateDTO();
@@ -76,6 +76,8 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
 
     @Override
     public ExchangeRateDTO updateExchangeRate(ExchangeRateDTO exchangeRateDTO, BigDecimal rate) {
+        if (rate == null || rate.compareTo(BigDecimal.ZERO) < 0)
+            throw new IllegalArgumentException("Invalid input: 'rate' must not be null or negative.");
 
         exchangeRateDTO.setRate(rate);
         ExchangeRate updatedRate = exchangeRateMapper.toExchangeRate(exchangeRateDTO);

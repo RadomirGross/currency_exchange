@@ -2,11 +2,11 @@ package com.gross.currency_exchange.util;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
-import org.hibernate.service.ServiceRegistry;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+
 
 import java.util.Properties;
 
@@ -17,31 +17,38 @@ public class HibernateSessionFactory {
 
     private HibernateSessionFactory() {
         // Настраиваем HikariCP
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl("jdbc:postgresql://localhost:5432/currency_db");
-        config.setUsername("myuser");
-        config.setPassword("mypassword");
-        config.setDriverClassName("org.postgresql.Driver");
-        config.setMaximumPoolSize(10);
+        try {
+            HikariConfig config = new HikariConfig();
+           config.setJdbcUrl("jdbc:postgresql://db:5432/currency_db");
+     //       config.setJdbcUrl("jdbc:postgresql://localhost:5432/currency_db");
+            config.setUsername("myuser");
+            config.setPassword("mypassword");
+            config.setDriverClassName("org.postgresql.Driver");
+            config.setMaximumPoolSize(10);
 
-        HikariDataSource dataSource = new HikariDataSource(config);
+            HikariDataSource dataSource = new HikariDataSource(config);
 
-        Properties properties = new Properties();
+            Properties properties = new Properties();
 
-        properties.put(Environment.HBM2DDL_AUTO, "validate");
-        properties.put(Environment.SHOW_SQL, "true");
+            properties.put(Environment.HBM2DDL_AUTO, "update");
+            properties.put(Environment.SHOW_SQL, "true");
 
-        Configuration configuration = new Configuration();
-        configuration.setProperties(properties);
-        configuration.addAnnotatedClass(com.gross.currency_exchange.model.Currency.class);
-        configuration.addAnnotatedClass(com.gross.currency_exchange.model.ExchangeRate.class);
 
+            Configuration configuration = new Configuration();
+            configuration.setProperties(properties);
+            configuration.addAnnotatedClass(com.gross.currency_exchange.model.Currency.class);
+            configuration.addAnnotatedClass(com.gross.currency_exchange.model.ExchangeRate.class);
+            configuration.getProperties().put(Environment.DATASOURCE, dataSource);
 // Передача DataSource в Hibernate
-        configuration.getProperties().put(Environment.DATASOURCE, dataSource);
-
-        sessionFactory = configuration.buildSessionFactory();
 
 
+            sessionFactory = configuration.buildSessionFactory();
+            System.out.println("Hibernate SessionFactory initialized successfully.");
+        } catch (HibernateException e) {
+            System.err.println("Error initializing Hibernate SessionFactory: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Hibernate initialization failed", e);
+        }
     }
 
     public static SessionFactory getSessionFactory() {

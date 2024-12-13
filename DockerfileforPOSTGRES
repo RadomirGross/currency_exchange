@@ -1,0 +1,9 @@
+FROM postgres:12-alpine3.20
+
+# Добавляем скрипт для инициализации базы данных
+COPY init.sql /docker-entrypoint-initdb.d/init.sql
+
+# Устанавливаем стандартные переменные среды
+ENV POSTGRES_USER=myuser
+ENV POSTGRES_PASSWORD=mypassword
+ENV POSTGRES_DB=currency_db

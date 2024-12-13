@@ -7,26 +7,24 @@ import lombok.ToString;
 
 
 @Data
-@Entity
-@Table(name = "currencies")
 @ToString
 @NoArgsConstructor
+@Entity
+@Table(name = "\"Currencies\"") // Используем двойные кавычки
 public class Currency {
-
-
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "\"ID\"")
     private int id;
 
-    @Column(name = "code", length = 10, nullable = false, unique = true)
+    @Column(name = "\"Code\"", length = 10, nullable = false, unique = true)
     private String code;
 
-    @Column(name = "fullname", nullable = false)
+    @Column(name = "\"FullName\"", nullable = false)
     private String name;
 
-    @Column(name = "sign", length = 10)
+    @Column(name = "\"Sign\"", length = 10)
     private String sign;
 
     public Currency(String code, String name, String sign) {
@@ -34,6 +32,8 @@ public class Currency {
         this.name = name;
         this.sign = sign;
     }
+
+
 
 
 }

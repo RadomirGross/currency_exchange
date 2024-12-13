@@ -1,0 +1,37 @@
+version: "3.1"
+services:
+  db:
+    image: grossradomir/currency_exchange:db
+    container_name: currency_db
+    ports:
+      - "5432:5432"
+    networks:
+      - currency_network
+
+  backend:
+    image: grossradomir/currency_exchange:backend-1.0
+    container_name: currency_backend
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=currency_db
+      - DB_USER=myuser
+      - DB_PASSWORD=mypassword
+    depends_on:
+      - db
+    networks:
+      - currency_network
+
+  frontend:
+    image: grossradomir/currency_exchange:frontend2-1.0
+    container_name: currency_frontend
+    ports:
+      - "80:80"
+    networks:
+      - currency_network
+
+networks:
+  currency_network:
+    driver: bridge

@@ -34,8 +34,8 @@ public class ExchangeRateDAOImpl implements ExchangeRateDAO {
     @Override
     public ExchangeRate getExchangeRate(Currency baseCurrency, Currency targetCurrency) {
         try (Session session = sessionFactory.openSession()) {
-            String sql = "SELECT * FROM exchange_rates where " +
-                    "base_currency_id = :baseCurrencyId and target_currency_id = :targetCurrencyId";
+            String sql = "SELECT * FROM \"ExchangeRates\" where " +
+                    "\"BaseCurrencyId\" = :baseCurrencyId and \"TargetCurrencyId\" = :targetCurrencyId";
 
             ExchangeRate exchangeRate = session.createNativeQuery(sql, ExchangeRate.class)
                     .setParameter("baseCurrencyId", baseCurrency.getId())
